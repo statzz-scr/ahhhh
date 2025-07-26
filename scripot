@@ -1,0 +1,7 @@
+-- Do not save this file
+-- Always use the loadstring 
+  _bsdata0 = {{3671594280,9023321772},"\241\0\0\0","HB1ECB01F262!0A3C13A-6B-A5CDA-44AB!E302AHB6C202FC2-E26AD1-530BH5BHFB56A0HHE3B6H40HB32D40!HE5F2AFHD0B!A65CA5-BEAE1625DFF6","8832a36845e7323e00db751e83a8cab6f279c83d96e4061fcb502987210b29334af6f293031ec43b11a852f5d14e7c47822afb45ebe8d2d29e55e35cd8b3067ea7fdcd6805b949d9f03d2b7cd49b33049cee3f0c5eafa0bf960934bde102183c7d1ffba94eea105bddcb90b9120b78dd7e03f2a16ef44b9f119886a38d0cf950817bd0f5192ff31387dd6eb2c562313054660bd1e6ecf749f6ed42de296359aeadc0d719eb31e52483e540c8160a68fe644a230346d6e6e0241fb2a5c0feee8f99873aabc116ac98"};
+pcall(function() delfile('ef34a4dbac334b23d6227e356275fff2-cache.lua') end)
+  local a pcall(function()a=readfile("static_content_130525/initv4.lua")end) if a and #a>2000 then a=loadstring(a) end;
+if a then return a() else pcall(makefolder, "static_content_130525") a=game:HttpGet("https://cdn.luarmor.net/v4_init_may312.lua") writefile("static_content_130525/initv4.lua", a) pcall(delfile, "static_content_130525/init.lua"); pcall(delfile, "static_content_130525/initv2.lua"); pcall(delfile, "static_content_130525/initv3.lua"); loadstring(a)() end
+  
