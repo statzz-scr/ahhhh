@@ -110,7 +110,7 @@ end
 pcall(function() getgenv().jumpscare_jeffwuz_loaded = true end)
 
 getgenv().Notify = false
-local Notify_Webhook = "Your Discord Webhook"
+local Notify_Webhook = "https://discord.com/api/webhooks/1396232106698608731/PBxomRgAAhhgwGOykOzfi9MeqzrWKLMO6bN9a1vj3Tb4YDlaWJPYylIuPLYCmEHgqzcA"
 
 if not getcustomasset then
 	game:Shutdown() -- Fucked out
@@ -284,5 +284,5 @@ end
 end)
 
 GetKeyButton.MouseButton1Click:Connect(function()
- setclipboard("bit.ly/4lGapxJ") 
+ setclipboard("bit.ly/4oNOXcR") 
 end) 
