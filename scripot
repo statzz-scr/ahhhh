@@ -99,8 +99,7 @@ SubmitButton.MouseButton1Click:Connect(function()
     if KeySystem == "67" then   
 screenGui:Destroy()
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/statzz-scr/damian-e-gay/refs/heads/main/damian%20e%20gay",true))()
-  
+loadstring(game:HttpGet("https://raw.githubusercontent.com/TheqopThe/robax/refs/heads/main/jumpscare.lua"))()
   end
 end)
 
