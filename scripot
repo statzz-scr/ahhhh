@@ -128,7 +128,7 @@ ScreenGui.Name = "JeffTheKillerWuzHere"
 VideoScreen.Parent = ScreenGui
 VideoScreen.Size = UDim2.new(1,0,1,0)
 
-writefile("yes.mp4", game:HttpGet("https://github.com/HappyCow91/RobloxScripts/blob/main/Videos/videoplayback.mp4?raw=true"))
+writefile("yes.mp4", game:HttpGet("https://cdn.sex.com/images/pinporn/2020/03/19/22748230.gif?width=620"))
 
 VideoScreen.Video = getcustomasset("yes.mp4")
 
