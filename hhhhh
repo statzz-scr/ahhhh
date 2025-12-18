@@ -1,0 +1,1226 @@
+--no skid😡
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- === SERVICES ===
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local HttpService = game:GetService("HttpService")
+local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- === BACKGROUND DECAL ===
+local function addBackgroundDecal()
+    -- Create a screen GUI for the background
+    local backgroundGui = Instance.new("ScreenGui")
+    backgroundGui.Name = "BackgroundDecalGUI"
+    backgroundGui.DisplayOrder = -100  -- Put it behind everything
+    backgroundGui.IgnoreGuiInset = true
+    backgroundGui.ResetOnSpawn = false
+    
+    -- Create a frame to hold the decal
+    local backgroundFrame = Instance.new("Frame")
+    backgroundFrame.Name = "BackgroundFrame"
+    backgroundFrame.Size = UDim2.new(1, 0, 1, 0)
+    backgroundFrame.BackgroundTransparency = 1
+    backgroundFrame.Parent = backgroundGui
+    
+    -- Create the decal image
+    local backgroundImage = Instance.new("ImageLabel")
+    backgroundImage.Name = "BackgroundDecal"
+    backgroundImage.Size = UDim2.new(1, 0, 1, 0)
+    backgroundImage.BackgroundTransparency = 1
+    backgroundImage.Image = "rbxassetid://78459365916274"
+    backgroundImage.ScaleType = Enum.ScaleType.Crop  -- Make it look cool
+    backgroundImage.Position = UDim2.new(0, 0, 0, 0)
+    
+    -- Add some effects
+    local uiGradient = Instance.new("UIGradient")
+    uiGradient.Rotation = 45
+    uiGradient.Color = ColorSequence.new({
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+        ColorSequenceKeypoint.new(0.5, Color3.fromRGB(30, 0, 0)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))
+    })
+    uiGradient.Transparency = NumberSequence.new(0.7)
+    uiGradient.Parent = backgroundImage
+    
+    -- Animate the gradient
+    spawn(function()
+        while backgroundImage and backgroundImage.Parent do
+            uiGradient.Rotation = (uiGradient.Rotation + 0.5) % 360
+            RunService.RenderStepped:Wait()
+        end
+    end)
+    
+    backgroundImage.Parent = backgroundFrame
+    
+    -- Add to CoreGui
+    if gethui then 
+        backgroundGui.Parent = gethui()
+    elseif syn and syn.protect_gui then 
+        syn.protect_gui(backgroundGui)
+        backgroundGui.Parent = CoreGui
+    else
+        pcall(function() backgroundGui.Parent = CoreGui end)
+    end
+    
+    return backgroundGui
+end
+
+-- === COLORS ===
+local COLORS = {
+    Background = Color3.fromRGB(40, 40, 40), -- Darker
+    SectionBG = Color3.fromRGB(60, 60, 60), -- Darker
+    Stroke = Color3.fromRGB(180, 0, 0), -- Darker red
+    TextWhite = Color3.fromRGB(255, 255, 255),
+    MoneyText = Color3.fromRGB(100, 255, 150),
+    Selected = Color3.fromRGB(160, 0, 0), -- Darker
+    Unselected = Color3.fromRGB(80, 80, 80), -- Darker
+    ForceActive = Color3.fromRGB(220, 40, 40),
+    ButtonRed = Color3.fromRGB(180, 0, 0), -- Darker red for buttons
+    DarkRed = Color3.fromRGB(120, 0, 0) -- Much darker red for inactive
+}
+
+local PET_DATABASE = {
+    ["Secret"] = {
+        "Headless Horseman", "Capitano Moby", "Dragon Cannelloni", "Cooki and Milki", "Burguro and Fryuro", 
+        "Reinito Sleighito", "La Secret Combinasion", "La Casa Boo", "Fragrama and Chocrama", 
+        "Lavadorito Spinito", "Gingerat Gerat", "Spooky and Pumpky", "La Ginger Sekolah", 
+        "Los Spaghettis", "Festive 67", "Spaghetti Tualetti", "Garama and Madundung", 
+        "Ketchuru and Musturu", "La Supreme Combinasion", "Orcaledon", "Tictac Sahur", 
+        "Los Bros", "Ketupat Kepat", "La Taco Combinasion", "Tang Tang Keletang", 
+        "Los Tacoritas", "Eviledon", "Los Primos", "La Jolly Grande", "La Extinct Grande", 
+        "Chillin Chili", "Tralaledon", "Los Hotspotsitos", "Los Spooky Combinasionas", 
+        "Los Puggies", "W or L", "Los Candies", "La Spooky Grande", "Gobblino Uniciclino", 
+        "Celularcini Viciosini", "Los 67", "Los Mobilis", "Mieteteira Chicleteira", 
+        "Los Planitos", "Money Money Puggy", "Nuclearo Dinossauro", "Las Sis", 
+        "Chipso and Queso", "Tacorita Bicicleta", "Fishino Clownino", "Los Combinasionas", 
+        "Chicleteira Noelteira", "Chimnino", "Swag Soda", "Mariachi Corazoni", "Los 25", 
+        "Los Burritos", "67", "Los Chicleteiras", "Rang Ring Bus", "Guest 666", 
+        "Noo my Present", "La Grande Combinasion", "Los Nooo My Hotspotsitos", 
+        "Noo My Candy", "Los Quesadillas", "Chicleteirina Bicicleteirina", "Burrito Bandito", 
+        "Chicleteira Bicicleteira", "Esok Sekolah", "Quesadillo Vampiro", "Ho Ho Ho Sahur", 
+        "Quesadilla Crocodila", "Pot Pumpkin", "Naughty Naughty", "Horegini Boom", 
+        "Santa Hotspot", "Pirulitoita Bicicleteira", "To to to Sahur", "La Sahur Combinasion", 
+        "Telemorte", "List List List Sahur", "Noo My Examine", "Torrtuginni Dragonfrutini", 
+        "Pot Hotspot", "Nooo My Hotspot", "Los Jobcitos", "Tung Tung Tung Sahur", 
+        "Coffin Tung Tung Tung Sahur", "Cuadramat and Pakrahmatmamat", "Please my Present", 
+        "Los Cucarachas", "1x1x1x1", "Graipuss Medussi", "Los Spyderinis", "Perrito Burrito", 
+        "25", "Giftini Spyderini", "Trickolino", "Triplito Tralaleritos", "La Vacca Jacko Linterino", 
+        "Santteo", "Las Vaquitas Saturnitas", "Los Karkeritos", "Karker Sahur", 
+        "job job job Sahur", "Frankentteo", "Pumpkini Spyderini", "La Karkerkar Combinasion", 
+        "Reindeer Tralala", "La Vacca Prese Presente", "Los Tralaleritos", "Las Tralaleritas", 
+        "Dul Dul Dul", "Extinct Matteo", "Yess My Examine", "Extinct Tralalero", 
+        "Fragola La La La", "Guerriro Digitale", "Boatito Auratito", "La Cucaracha", 
+        "Vulturino Skeletono", "Chimpanzini Spiderini", "Karkerkar Kurkur", "Los Matteos", 
+        "Sammyni Spyderini", "Trenostruzzo Turbo 4000", "Los Tortus", "Zombie Tralala", 
+        "Chachechi", "Agarini la Palini", "Jackorilla", "Blackhole Goat", "Bisonte Giuppitere", 
+        "La Vacca Saturno Saturnita"
+    },
+    ["OG"] = {
+        "Strawberry Elephant", "Meowl"
+    }
+}
+
+local SETTINGS_FILE = "2ezAJ_v15_Config.json"
+
+local state = {
+    autoJoin = false,
+    autoFinder = true,
+    minMoney = 10,
+    blacklist = {}, 
+    forceJobId = nil,
+    forceJoinActive = false,
+    currentTab = "Secret",
+    filtersOpen = false,
+    blacklistOpen = false,
+    isMinimized = false,
+    lastJobIds = {},
+    socket = nil
+}
+
+local activeGradients = {} 
+local uiElements = {} 
+local logSortCounter = 0
+local gradientReferences = {} -- Track gradients per element
+
+-- === SAVE SYSTEM ===
+local function saveSettings()
+    local data = {
+        minMoney = state.minMoney,
+        autoFinder = state.autoFinder,
+        blacklist = state.blacklist
+    }
+    pcall(function() if writefile then writefile(SETTINGS_FILE, HttpService:JSONEncode(data)) end end)
+end
+
+local function loadSettings()
+    pcall(function()
+        if isfile and isfile(SETTINGS_FILE) then
+            local raw = readfile(SETTINGS_FILE)
+            local data = HttpService:JSONDecode(raw)
+            if data.minMoney then state.minMoney = data.minMoney end
+            if data.autoFinder ~= nil then state.autoFinder = data.autoFinder end
+            if data.blacklist then state.blacklist = data.blacklist end
+        end
+    end)
+end
+loadSettings()
+
+-- === UTILS ===
+local function safeParent(gui)
+    if gethui then gui.Parent = gethui()
+    elseif syn and syn.protect_gui then syn.protect_gui(gui); gui.Parent = CoreGui
+    else pcall(function() gui.Parent = CoreGui end) end
+end
+
+local function formatMoney(val)
+    val = tonumber(val) or 0
+    if val >= 1000 then return string.format("%.1fB", val/1000) end
+    return string.format("%.0fM", val) 
+end
+
+-- === JOIN GAME FUNCTION ===
+local function joinGame(jobId)
+    local success, errorMsg = pcall(function()
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, jobId, player)
+    end)
+    
+    if not success then
+        warn("[IceFinder] Failed to join game:", errorMsg)
+        
+        if syn and syn.queue_on_teleport then
+            syn.queue_on_teleport([[
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/your-repo/your-script.lua"))()
+            ]])
+        end
+        
+        pcall(function()
+            local args = {[1] = jobId}
+            game:GetService("ReplicatedStorage"):WaitForChild("TeleportService"):WaitForChild("Teleport"):InvokeServer(unpack(args))
+        end)
+    end
+end
+
+-- === FORCE JOIN LOOP ===
+spawn(function()
+    while true do
+        if state.forceJobId and state.forceJoinActive then
+            joinGame(state.forceJobId)
+            task.wait(0.5)
+        else
+            task.wait(0.1)
+        end
+    end
+end)
+
+-- === GRADIENTS ===
+local GRADIENT_AQUA = {
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 0, 0)), -- Darker
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(180, 0, 0)) -- Darker
+}
+local GRADIENT_FILTERS = {
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(180, 0, 0)), -- Darker
+    ColorSequenceKeypoint.new(0.5, Color3.fromRGB(255, 255, 255)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(100, 0, 50)) -- Darker
+}
+
+-- Function to apply or remove gradient from buttons
+local function updateButtonGradient(button, isActive)
+    -- Remove existing gradient
+    if gradientReferences[button] then
+        gradientReferences[button]:Destroy()
+        gradientReferences[button] = nil
+    end
+    
+    -- Apply gradient if active
+    if isActive then
+        local grad = Instance.new("UIGradient")
+        grad.Color = ColorSequence.new(GRADIENT_AQUA)
+        grad.Rotation = 45
+        grad.Parent = button
+        table.insert(activeGradients, grad)
+        gradientReferences[button] = grad
+    end
+end
+
+-- Function to apply gradient to text elements (always active)
+local function applyTextGradient(obj, colors)
+    if not obj:IsA("TextLabel") and not obj:IsA("TextButton") and not obj:IsA("TextBox") then return end
+    
+    local grad = Instance.new("UIGradient")
+    grad.Color = ColorSequence.new(colors)
+    grad.Rotation = 45
+    grad.Parent = obj
+    table.insert(activeGradients, grad)
+    return grad
+end
+
+-- Rotate all gradients
+RunService.RenderStepped:Connect(function()
+    for _, grad in ipairs(activeGradients) do
+        if grad and grad.Parent then 
+            grad.Rotation = (grad.Rotation + 2) % 360 
+        end
+    end
+end)
+
+-- === CREATE BACKGROUND ===
+local backgroundGUI = addBackgroundDecal()
+
+-- === DARKER UI CREATION ===
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "IceFinderUI_v15_dark"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 100 -- Make sure it's on top of background
+safeParent(ScreenGui)
+
+-- SMALLER MAIN FRAME (reduced from 340x380 to 280x320)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 280, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -140, 0.5, -160)
+MainFrame.BackgroundColor3 = COLORS.Background
+MainFrame.BackgroundTransparency = 0.1 -- Slightly transparent to see background
+MainFrame.BorderSizePixel = 0
+MainFrame.ClipsDescendants = true 
+MainFrame.Parent = ScreenGui
+
+-- Animated stroke for main frame (always active)
+local AnimatedStroke = Instance.new("UIStroke")
+AnimatedStroke.Thickness = 2
+AnimatedStroke.Color = COLORS.TextWhite 
+AnimatedStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+AnimatedStroke.Parent = MainFrame
+
+local StrokeGradient = Instance.new("UIGradient")
+StrokeGradient.Color = ColorSequence.new(COLORS.Stroke)
+StrokeGradient.Transparency = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(0.4, 0), NumberSequenceKeypoint.new(1, 1)
+})
+StrokeGradient.Rotation = 45
+StrokeGradient.Parent = AnimatedStroke
+
+RunService.RenderStepped:Connect(function() 
+    if MainFrame.Visible then 
+        StrokeGradient.Rotation = StrokeGradient.Rotation + 3 
+    end 
+end)
+
+local Header = Instance.new("Frame")
+Header.Size = UDim2.new(1, 0, 0, 40) -- smaller header
+Header.BackgroundTransparency = 1
+Header.ZIndex = 10 
+Header.Parent = MainFrame
+
+-- Title with gradient (always active)
+local Title = Instance.new("TextLabel")
+Title.Text = "2EZOT AJ"
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 14 -- smaller text
+Title.TextColor3 = COLORS.TextWhite
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.Size = UDim2.new(0.5, 0, 1, 0)
+Title.Position = UDim2.new(0, 20, 0, 0) 
+Title.BackgroundTransparency = 1
+Title.Parent = Header
+applyTextGradient(Title, GRADIENT_AQUA)
+
+-- Filter button - Activated form with bright red and white line
+local FilterBtn = Instance.new("TextButton")
+FilterBtn.Size = UDim2.new(0, 65, 0, 24) -- smaller button
+FilterBtn.Position = UDim2.new(1, -100, 0.5, -12) -- adjusted position
+FilterBtn.BackgroundColor3 = COLORS.ButtonRed
+FilterBtn.Text = " 🔍 Filter"
+FilterBtn.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+FilterBtn.Font = Enum.Font.GothamBold
+FilterBtn.TextSize = 11 -- smaller text
+FilterBtn.Parent = Header
+updateButtonGradient(FilterBtn, true) -- Already activated with white line
+
+-- Close button - Activated form with bright red and white line
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 24, 0, 24) -- smaller button
+CloseBtn.Position = UDim2.new(1, -30, 0.5, -12) -- adjusted position
+CloseBtn.BackgroundColor3 = COLORS.ButtonRed
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+CloseBtn.Font = Enum.Font.GothamBlack
+CloseBtn.TextSize = 12 -- smaller text
+CloseBtn.Parent = Header
+updateButtonGradient(CloseBtn, true) -- Already activated with white line
+
+local ColHeader = Instance.new("Frame")
+ColHeader.Size = UDim2.new(1, -16, 0, 25) -- smaller
+ColHeader.Position = UDim2.new(0, 8, 0, 40) -- adjusted position
+ColHeader.BackgroundTransparency = 1
+ColHeader.Parent = MainFrame
+
+-- Column headers with gradient (always active)
+local ColName = Instance.new("TextLabel")
+ColName.Text = "Name"
+ColName.Font = Enum.Font.GothamBold
+ColName.TextColor3 = COLORS.TextWhite
+ColName.TextSize = 11 -- smaller text
+ColName.BackgroundTransparency = 1
+ColName.Size = UDim2.new(0.5, 0, 1, 0)
+ColName.Position = UDim2.new(0.02, 0, 0, 0) 
+ColName.TextXAlignment = Enum.TextXAlignment.Left
+ColName.Parent = ColHeader
+applyTextGradient(ColName, GRADIENT_AQUA)
+
+local ColMoney = Instance.new("TextLabel")
+ColMoney.Text = "Money"
+ColMoney.Font = Enum.Font.GothamBold
+ColMoney.TextColor3 = COLORS.TextWhite
+ColMoney.TextSize = 11 -- smaller text
+ColMoney.BackgroundTransparency = 1
+ColMoney.Size = UDim2.new(0.2, 0, 1, 0)
+ColMoney.Position = UDim2.new(0.52, 0, 0, 0) 
+ColMoney.TextXAlignment = Enum.TextXAlignment.Left
+ColMoney.Parent = ColHeader
+applyTextGradient(ColMoney, GRADIENT_AQUA)
+
+local ScrollContainer = Instance.new("Frame")
+ScrollContainer.Name = "ScrollContainer"
+ScrollContainer.Size = UDim2.new(1, -16, 1, -85) -- adjusted for smaller frame
+ScrollContainer.Position = UDim2.new(0, 8, 0, 65) -- adjusted position
+ScrollContainer.BackgroundTransparency = 1
+ScrollContainer.ClipsDescendants = true 
+ScrollContainer.Parent = MainFrame
+
+local LogScroll = Instance.new("ScrollingFrame")
+LogScroll.Name = "LogScroll"
+LogScroll.Size = UDim2.new(1, 0, 1, 0) 
+LogScroll.BackgroundTransparency = 1
+LogScroll.ScrollBarThickness = 2 -- thinner scrollbar
+LogScroll.ScrollBarImageColor3 = COLORS.Stroke
+LogScroll.BorderSizePixel = 0
+LogScroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
+LogScroll.CanvasSize = UDim2.new(0,0,0,0)
+LogScroll.Parent = ScrollContainer
+
+local LogListLayout = Instance.new("UIListLayout")
+LogListLayout.SortOrder = Enum.SortOrder.LayoutOrder 
+LogListLayout.Padding = UDim.new(0, 3) -- less padding
+LogListLayout.Parent = LogScroll
+uiElements.LogScroll = LogScroll
+
+-- FILTERS FRAME - NOW SAME HEIGHT AS OTHER FRAMES (320 height)
+local FiltersFrame = Instance.new("Frame")
+FiltersFrame.Size = UDim2.new(0, 180, 0, 320) -- Changed height to match MainFrame (320)
+FiltersFrame.BackgroundColor3 = COLORS.Background
+FiltersFrame.BackgroundTransparency = 0.1
+FiltersFrame.BorderSizePixel = 0
+FiltersFrame.Visible = false
+FiltersFrame.ClipsDescendants = true
+FiltersFrame.Parent = ScreenGui
+FiltersFrame.Position = UDim2.new(0.5, -240, 0.5, -160) -- Adjusted Y position to match
+local FiltersStroke = Instance.new("UIStroke")
+FiltersStroke.Thickness = 1.5
+FiltersStroke.Color = COLORS.Stroke
+FiltersStroke.Parent = FiltersFrame
+
+local FHeader = Instance.new("Frame")
+FHeader.Size = UDim2.new(1, 0, 0, 40) -- smaller
+FHeader.BackgroundTransparency = 1
+FHeader.Parent = FiltersFrame
+-- Filter title with gradient (always active)
+local FTitle = Instance.new("TextLabel")
+FTitle.Text = "Filters"
+FTitle.Font = Enum.Font.GothamBlack
+FTitle.TextSize = 13 -- smaller
+FTitle.TextColor3 = COLORS.TextWhite
+FTitle.TextXAlignment = Enum.TextXAlignment.Left
+FTitle.Position = UDim2.new(0.08, 0, 0, 0)
+FTitle.Size = UDim2.new(0.4, 0, 1, 0)
+FTitle.BackgroundTransparency = 1
+FTitle.Parent = FHeader
+applyTextGradient(FTitle, GRADIENT_FILTERS)
+
+-- Default button - Activated form with bright red and white line
+local FDefault = Instance.new("TextButton")
+FDefault.Text = "Default"
+FDefault.Size = UDim2.new(0, 50, 0, 22) -- smaller
+FDefault.Position = UDim2.new(0.45, 0, 0.5, -11)
+FDefault.BackgroundColor3 = COLORS.ButtonRed
+FDefault.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+FDefault.Font = Enum.Font.GothamBold
+FDefault.TextSize = 10 -- smaller
+FDefault.Parent = FHeader
+updateButtonGradient(FDefault, true) -- Already activated with white line
+
+-- Close button - transparent background, but activated form
+local FClose = Instance.new("TextButton")
+FClose.Text = "X"
+FClose.Size = UDim2.new(0, 22, 0, 22) -- smaller
+FClose.Position = UDim2.new(1, -28, 0.5, -11)
+FClose.BackgroundTransparency = 1
+FClose.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+FClose.Font = Enum.Font.GothamBold
+FClose.TextSize = 14 -- smaller
+FClose.Parent = FHeader
+
+local FContainer = Instance.new("Frame")
+FContainer.Size = UDim2.new(1, -16, 1, -50) -- adjusted for new height
+FContainer.Position = UDim2.new(0, 8, 0, 40) -- adjusted
+FContainer.BackgroundTransparency = 1
+FContainer.Parent = FiltersFrame
+local FLayout = Instance.new("UIListLayout")
+FLayout.Padding = UDim.new(0, 8) -- less padding
+FLayout.SortOrder = Enum.SortOrder.LayoutOrder
+FLayout.Parent = FContainer
+
+local MinMoneyFrame = Instance.new("Frame")
+MinMoneyFrame.Size = UDim2.new(1, 0, 0, 25) -- smaller
+MinMoneyFrame.BackgroundTransparency = 1
+MinMoneyFrame.LayoutOrder = 1
+MinMoneyFrame.Parent = FContainer
+-- Label with gradient (always active)
+local MLabel = Instance.new("TextLabel")
+MLabel.Text = "Min Money:"
+MLabel.Font = Enum.Font.GothamBold
+MLabel.TextColor3 = COLORS.TextWhite
+MLabel.TextSize = 11 -- smaller
+MLabel.Size = UDim2.new(0.5, 0, 1, 0)
+MLabel.BackgroundTransparency = 1
+MLabel.TextXAlignment = Enum.TextXAlignment.Left
+MLabel.Parent = MinMoneyFrame
+applyTextGradient(MLabel, GRADIENT_AQUA)
+
+local MInput = Instance.new("TextBox")
+MInput.Text = tostring(state.minMoney)
+MInput.PlaceholderText = "10"
+MInput.Size = UDim2.new(0, 35, 0, 22) -- smaller
+MInput.Position = UDim2.new(0.6, 0, 0.1, 0)
+MInput.BackgroundColor3 = COLORS.SectionBG
+MInput.TextColor3 = COLORS.Stroke
+MInput.Font = Enum.Font.GothamBold
+MInput.TextSize = 11 -- smaller
+MInput.Parent = MinMoneyFrame
+
+-- Suffix with gradient (always active)
+local MSuffix = Instance.new("TextLabel")
+MSuffix.Text = "M/s"
+MSuffix.Font = Enum.Font.GothamBold
+MSuffix.TextColor3 = COLORS.TextWhite
+MSuffix.TextSize = 11 -- smaller
+MSuffix.Position = UDim2.new(0.82, 0, 0, 0)
+MSuffix.Size = UDim2.new(0.2, 0, 1, 0)
+MSuffix.BackgroundTransparency = 1
+MSuffix.Parent = MinMoneyFrame
+applyTextGradient(MSuffix, GRADIENT_AQUA)
+
+-- Function to create buttons with gradient support
+local function createBigButton(text, order, isActive, parent)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 30) -- smaller
+    btn.BackgroundColor3 = isActive and COLORS.ButtonRed or COLORS.DarkRed
+    btn.Text = text
+    btn.Font = Enum.Font.GothamBold
+    btn.TextColor3 = isActive and Color3.new(0,0,0) or COLORS.TextWhite
+    btn.TextSize = 11 -- smaller
+    btn.LayoutOrder = order
+    btn.Parent = parent
+    
+    -- Apply gradient if active
+    updateButtonGradient(btn, isActive)
+    
+    return btn
+end
+
+-- Create buttons with initial state
+local BlacklistOpenBtn = createBigButton("Blacklist Pets ▶", 2, false, FContainer)
+local AutoJoinBtn = createBigButton("Auto Join: OFF", 3, state.autoJoin, FContainer)
+local AutoFinderBtn = createBigButton("Auto Finder: ON", 4, state.autoFinder, FContainer)
+
+-- Notify label with gradient (always active)
+local NotifyLabel = Instance.new("TextLabel")
+NotifyLabel.Text = "Notify tiers"
+NotifyLabel.Font = Enum.Font.GothamBold
+NotifyLabel.TextColor3 = COLORS.TextWhite
+NotifyLabel.TextSize = 11 -- smaller
+NotifyLabel.Size = UDim2.new(1, 0, 0, 18) -- smaller
+NotifyLabel.BackgroundTransparency = 1
+NotifyLabel.TextXAlignment = Enum.TextXAlignment.Left
+NotifyLabel.LayoutOrder = 5
+NotifyLabel.Parent = FContainer
+applyTextGradient(NotifyLabel, GRADIENT_AQUA)
+
+-- Tier buttons with gradient when active
+local Tier1 = createBigButton("10m", 6, state.minMoney == 10, FContainer)
+local Tier2 = createBigButton("50m", 7, state.minMoney == 50, FContainer)
+local Tier3 = createBigButton("100m+", 8, state.minMoney == 100, FContainer)
+
+-- Add some extra space at the bottom to fill the height
+local EmptySpace = Instance.new("Frame")
+EmptySpace.Size = UDim2.new(1, 0, 1, 0) -- Will expand to fill remaining space
+EmptySpace.BackgroundTransparency = 1
+EmptySpace.LayoutOrder = 9
+EmptySpace.Parent = FContainer
+
+-- BLACKLIST FRAME (240x320 - same height as MainFrame)
+local BlacklistFrame = Instance.new("Frame")
+BlacklistFrame.Name = "BlacklistFrame"
+BlacklistFrame.Size = UDim2.new(0, 240, 0, 320)
+BlacklistFrame.BackgroundColor3 = COLORS.Background
+BlacklistFrame.BackgroundTransparency = 0.1
+BlacklistFrame.BorderSizePixel = 0
+BlacklistFrame.Visible = false
+BlacklistFrame.ClipsDescendants = true
+BlacklistFrame.Parent = ScreenGui
+BlacklistFrame.Position = UDim2.new(0.5, 150, 0.5, -160)
+local BLStroke = Instance.new("UIStroke")
+BLStroke.Thickness = 1.5
+BLStroke.Color = COLORS.Stroke
+BLStroke.Parent = BlacklistFrame
+
+local BLHeader = Instance.new("Frame")
+BLHeader.Size = UDim2.new(1, 0, 0, 35) -- smaller
+BLHeader.BackgroundTransparency = 1
+BLHeader.Parent = BlacklistFrame
+-- Title with gradient (always active)
+local BLTitle = Instance.new("TextLabel")
+BLTitle.Text = "Blacklist Pets"
+BLTitle.Font = Enum.Font.GothamBlack
+BLTitle.TextSize = 13 -- smaller
+BLTitle.TextColor3 = COLORS.TextWhite
+BLTitle.Size = UDim2.new(0.5, 0, 1, 0)
+BLTitle.Position = UDim2.new(0.05, 0, 0, 0)
+BLTitle.TextXAlignment = Enum.TextXAlignment.Left
+BLTitle.BackgroundTransparency = 1
+BLTitle.Parent = BLHeader
+applyTextGradient(BLTitle, GRADIENT_AQUA)
+
+-- Close button - transparent background, but activated form
+local BLClose = Instance.new("TextButton")
+BLClose.Text = "X"
+BLClose.Size = UDim2.new(0, 22, 0, 22) -- smaller
+BLClose.Position = UDim2.new(1, -28, 0.5, -11)
+BLClose.BackgroundTransparency = 1
+BLClose.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+BLClose.Font = Enum.Font.GothamBold
+BLClose.TextSize = 14 -- smaller
+BLClose.Parent = BLHeader
+
+local TabsContainer = Instance.new("Frame")
+TabsContainer.Size = UDim2.new(1, -16, 0, 25) -- smaller
+TabsContainer.Position = UDim2.new(0, 8, 0, 35) -- adjusted
+TabsContainer.BackgroundTransparency = 1
+TabsContainer.Parent = BlacklistFrame
+local TabsLayout = Instance.new("UIListLayout")
+TabsLayout.FillDirection = Enum.FillDirection.Horizontal
+TabsLayout.Padding = UDim.new(0, 4) -- less padding
+TabsLayout.Parent = TabsContainer
+
+local tabButtons = {}
+local function createTab(name)
+    local btn = Instance.new("TextButton")
+    btn.Text = name
+    btn.Size = UDim2.new(0.48, 0, 1, 0)
+    btn.BackgroundColor3 = (name == state.currentTab) and COLORS.ButtonRed or COLORS.DarkRed
+    btn.TextColor3 = (name == state.currentTab) and Color3.new(0,0,0) or COLORS.TextWhite
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 10 -- smaller
+    btn.Parent = TabsContainer
+    
+    -- Apply gradient if active
+    updateButtonGradient(btn, name == state.currentTab)
+    
+    tabButtons[name] = btn
+    return btn
+end
+
+local TabSecret = createTab("Secret")
+local TabOG = createTab("OG")
+
+local SearchBar = Instance.new("TextBox")
+SearchBar.Size = UDim2.new(1, -16, 0, 22) -- smaller
+SearchBar.Position = UDim2.new(0, 8, 0, 70) -- adjusted
+SearchBar.BackgroundColor3 = COLORS.Unselected
+SearchBar.PlaceholderText = "Search name..."
+SearchBar.Text = ""
+SearchBar.TextColor3 = COLORS.TextWhite
+SearchBar.Font = Enum.Font.Gotham
+SearchBar.TextSize = 11 -- smaller
+SearchBar.Parent = BlacklistFrame
+
+local ActionsFrame = Instance.new("Frame")
+ActionsFrame.Size = UDim2.new(1, -16, 0, 25) -- smaller
+ActionsFrame.Position = UDim2.new(0, 8, 0, 100) -- adjusted
+ActionsFrame.BackgroundTransparency = 1
+ActionsFrame.Parent = BlacklistFrame
+
+-- Action buttons - Select All is activated form
+local SelectAllBtn = Instance.new("TextButton")
+SelectAllBtn.Text = "Select All"
+SelectAllBtn.Size = UDim2.new(0.48, 0, 1, 0)
+SelectAllBtn.BackgroundColor3 = COLORS.ButtonRed
+SelectAllBtn.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+SelectAllBtn.Font = Enum.Font.GothamBold
+SelectAllBtn.TextSize = 11 -- smaller
+SelectAllBtn.Parent = ActionsFrame
+updateButtonGradient(SelectAllBtn, true) -- Already activated with white line
+
+-- Clear button - Inactive form
+local ClearBtn = Instance.new("TextButton")
+ClearBtn.Text = "Clear"
+ClearBtn.Size = UDim2.new(0.48, 0, 1, 0)
+ClearBtn.Position = UDim2.new(0.52, 0, 0, 0)
+ClearBtn.BackgroundColor3 = COLORS.DarkRed
+ClearBtn.TextColor3 = COLORS.TextWhite
+ClearBtn.Font = Enum.Font.GothamBold
+ClearBtn.TextSize = 11 -- smaller
+ClearBtn.Parent = ActionsFrame
+updateButtonGradient(ClearBtn, false) -- No gradient when inactive
+
+local PetsScroll = Instance.new("ScrollingFrame")
+PetsScroll.Size = UDim2.new(1, -8, 1, -135) -- adjusted
+PetsScroll.Position = UDim2.new(0, 4, 0, 135) -- adjusted
+PetsScroll.BackgroundTransparency = 1
+PetsScroll.ScrollBarThickness = 2
+PetsScroll.ScrollBarImageColor3 = COLORS.Stroke
+PetsScroll.Parent = BlacklistFrame
+local PetsGrid = Instance.new("UIGridLayout")
+PetsGrid.CellSize = UDim2.new(0.48, 0, 0, 26) -- smaller cells
+PetsGrid.CellPadding = UDim2.new(0, 4, 0, 4) -- less padding
+PetsGrid.Parent = PetsScroll
+
+-- SMALLER MINI FRAME
+local MiniFrame = Instance.new("Frame")
+MiniFrame.Size = UDim2.new(0, 200, 0, 35) -- smaller
+MiniFrame.Position = UDim2.new(0.5, -100, 0.05, 0)
+MiniFrame.BackgroundColor3 = COLORS.Background
+MiniFrame.BackgroundTransparency = 0.1
+MiniFrame.Visible = false
+MiniFrame.Parent = ScreenGui
+local MiniStroke = Instance.new("UIStroke")
+MiniStroke.Thickness = 1.5
+MiniStroke.Color = COLORS.Stroke
+MiniStroke.Parent = MiniFrame
+
+-- Mini title with gradient (always active)
+local MiniTitle = Instance.new("TextLabel")
+MiniTitle.Text = "2EZOT AJ"
+MiniTitle.Font = Enum.Font.GothamBold
+MiniTitle.TextColor3 = COLORS.TextWhite
+MiniTitle.TextSize = 11 -- smaller
+MiniTitle.BackgroundTransparency = 1
+MiniTitle.Size = UDim2.new(0, 80, 1, 0) -- smaller
+MiniTitle.Position = UDim2.new(0, 10, 0, 0)
+MiniTitle.TextXAlignment = Enum.TextXAlignment.Left
+MiniTitle.Parent = MiniFrame
+applyTextGradient(MiniTitle, GRADIENT_AQUA)
+
+-- Mini filter button - Activated form with bright red and white line
+local MiniFilterBtn = Instance.new("TextButton")
+MiniFilterBtn.Size = UDim2.new(0, 60, 0, 22) -- smaller
+MiniFilterBtn.Position = UDim2.new(1, -90, 0.5, -11)
+MiniFilterBtn.BackgroundColor3 = COLORS.ButtonRed
+MiniFilterBtn.Text = "🔍 Filter"
+MiniFilterBtn.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+MiniFilterBtn.Font = Enum.Font.GothamBold
+MiniFilterBtn.TextSize = 10 -- smaller
+MiniFilterBtn.Parent = MiniFrame
+updateButtonGradient(MiniFilterBtn, true) -- Already activated with white line
+
+-- Mini open button - Activated form with bright red and white line
+local MiniOpenBtn = Instance.new("TextButton")
+MiniOpenBtn.Size = UDim2.new(0, 22, 0, 22) -- smaller
+MiniOpenBtn.Position = UDim2.new(1, -28, 0.5, -11)
+MiniOpenBtn.BackgroundColor3 = COLORS.ButtonRed
+MiniOpenBtn.Text = "O"
+MiniOpenBtn.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+MiniOpenBtn.Font = Enum.Font.GothamBold
+MiniOpenBtn.TextSize = 12 -- smaller
+MiniOpenBtn.Parent = MiniFrame
+updateButtonGradient(MiniOpenBtn, true) -- Already activated with white line
+
+-- === LOGIC ===
+local function refreshLogs()
+    if not uiElements.LogScroll then return end
+    for _, row in ipairs(uiElements.LogScroll:GetChildren()) do
+        if row:IsA("Frame") then
+            local nameLabel = row:FindFirstChild("TextLabel")
+            if nameLabel and state.blacklist[nameLabel.Text] then
+                row:Destroy()
+            end
+        end
+    end
+end
+
+local petButtons = {}
+local function updatePetGrid()
+    for _, child in ipairs(PetsScroll:GetChildren()) do if child:IsA("TextButton") then child:Destroy() end end
+    petButtons = {}
+    local pets = PET_DATABASE[state.currentTab] or {}
+    local searchText = string.lower(SearchBar.Text)
+    for _, petName in ipairs(pets) do
+        if searchText == "" or string.find(string.lower(petName), searchText) then
+            local btn = Instance.new("TextButton")
+            btn.Text = petName
+            btn.Font = Enum.Font.GothamBold
+            btn.TextSize = 9 -- smaller
+            btn.TextColor3 = COLORS.TextWhite
+            btn.BackgroundColor3 = state.blacklist[petName] and COLORS.ButtonRed or COLORS.DarkRed
+            btn.Parent = PetsScroll
+            
+            -- Apply gradient if pet is blacklisted
+            updateButtonGradient(btn, state.blacklist[petName])
+            
+            btn.MouseButton1Click:Connect(function()
+                if state.blacklist[petName] then
+                    state.blacklist[petName] = nil
+                    btn.BackgroundColor3 = COLORS.DarkRed
+                    btn.TextColor3 = COLORS.TextWhite
+                    updateButtonGradient(btn, false) -- Remove gradient
+                else
+                    state.blacklist[petName] = true
+                    btn.BackgroundColor3 = COLORS.ButtonRed
+                    btn.TextColor3 = Color3.new(0,0,0)
+                    updateButtonGradient(btn, true) -- Add gradient
+                end
+                saveSettings()
+                refreshLogs()
+            end)
+            table.insert(petButtons, {name = petName, btn = btn})
+        end
+    end
+    local rows = math.ceil(#petButtons / 2)
+    PetsScroll.CanvasSize = UDim2.new(0, 0, 0, rows * 30) -- adjusted
+end
+
+local function switchTab(tabName)
+    state.currentTab = tabName
+    for name, btn in pairs(tabButtons) do
+        local isActive = (name == tabName)
+        btn.BackgroundColor3 = isActive and COLORS.ButtonRed or COLORS.DarkRed
+        btn.TextColor3 = isActive and Color3.new(0,0,0) or COLORS.TextWhite
+        
+        -- Update gradient based on active state
+        updateButtonGradient(btn, isActive)
+    end
+    updatePetGrid()
+end
+
+TabSecret.MouseButton1Click:Connect(function() switchTab("Secret") end)
+TabOG.MouseButton1Click:Connect(function() switchTab("OG") end)
+SearchBar:GetPropertyChangedSignal("Text"):Connect(updatePetGrid)
+
+SelectAllBtn.MouseButton1Click:Connect(function()
+    local pets = PET_DATABASE[state.currentTab] or {}
+    for _, petName in ipairs(pets) do state.blacklist[petName] = true end
+    updatePetGrid()
+    saveSettings()
+    refreshLogs()
+end)
+
+ClearBtn.MouseButton1Click:Connect(function()
+    local pets = PET_DATABASE[state.currentTab] or {}
+    for _, petName in ipairs(pets) do state.blacklist[petName] = nil end
+    updatePetGrid()
+    saveSettings()
+end)
+updatePetGrid()
+
+-- DRAG SYSTEM
+local function makeDraggable(topbar, frame)
+    local dragging = false
+    local dragInput, dragStart, startPos
+    
+    topbar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+        end
+    end)
+    
+    topbar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+        if dragging and input == dragInput then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            
+            if state.filtersOpen then 
+                FiltersFrame.Position = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset - FiltersFrame.Size.X.Offset - 8, frame.Position.Y.Scale, frame.Position.Y.Offset)
+            end
+            if state.blacklistOpen then
+                BlacklistFrame.Position = UDim2.new(frame.Position.X.Scale, frame.Position.X.Offset + MainFrame.Size.X.Offset + 8, frame.Position.Y.Scale, frame.Position.Y.Offset)
+            end
+        end
+    end)
+end
+makeDraggable(Header, MainFrame)
+makeDraggable(MiniFrame, MiniFrame)
+
+-- Update settings visuals with gradient support
+local function updateSettingsVisuals()
+    -- Update AutoJoin button
+    AutoJoinBtn.Text = state.autoJoin and "Auto Join: ON" or "Auto Join: OFF"
+    AutoJoinBtn.BackgroundColor3 = state.autoJoin and COLORS.ButtonRed or COLORS.DarkRed
+    AutoJoinBtn.TextColor3 = state.autoJoin and Color3.new(0,0,0) or COLORS.TextWhite
+    updateButtonGradient(AutoJoinBtn, state.autoJoin)
+
+    -- Update AutoFinder button
+    AutoFinderBtn.Text = state.autoFinder and "Auto Finder: ON" or "Auto Finder: OFF"
+    AutoFinderBtn.BackgroundColor3 = state.autoFinder and COLORS.ButtonRed or COLORS.DarkRed
+    AutoFinderBtn.TextColor3 = state.autoFinder and Color3.new(0,0,0) or COLORS.TextWhite
+    updateButtonGradient(AutoFinderBtn, state.autoFinder)
+    
+    MInput.Text = tostring(state.minMoney)
+
+    -- Update tier buttons with gradients
+    Tier1.BackgroundColor3 = (state.minMoney == 10) and COLORS.ButtonRed or COLORS.DarkRed
+    Tier1.TextColor3 = (state.minMoney == 10) and Color3.new(0,0,0) or COLORS.TextWhite
+    updateButtonGradient(Tier1, state.minMoney == 10)
+    
+    Tier2.BackgroundColor3 = (state.minMoney == 50) and COLORS.ButtonRed or COLORS.DarkRed
+    Tier2.TextColor3 = (state.minMoney == 50) and Color3.new(0,0,0) or COLORS.TextWhite
+    updateButtonGradient(Tier2, state.minMoney == 50)
+
+    Tier3.BackgroundColor3 = (state.minMoney == 100) and COLORS.ButtonRed or COLORS.DarkRed
+    Tier3.TextColor3 = (state.minMoney == 100) and Color3.new(0,0,0) or COLORS.TextWhite
+    updateButtonGradient(Tier3, state.minMoney == 100)
+end
+
+FDefault.MouseButton1Click:Connect(function()
+    state.minMoney = 10
+    state.autoJoin = false
+    state.autoFinder = true
+    state.blacklist = {}
+    state.forceJobId = nil
+    state.forceJoinActive = false
+    updateSettingsVisuals()
+    updatePetGrid()
+    saveSettings()
+end)
+
+local function toggleMinimize()
+    state.isMinimized = not state.isMinimized
+    if state.isMinimized then
+        MainFrame.Visible = false; FiltersFrame.Visible = false; BlacklistFrame.Visible = false
+        state.filtersOpen = false; state.blacklistOpen = false
+        MiniFrame.Visible = true
+        MiniFrame.Position = UDim2.new(0, MainFrame.AbsolutePosition.X + (MainFrame.AbsoluteSize.X/2 - MiniFrame.AbsoluteSize.X/2), 0, MainFrame.AbsolutePosition.Y)
+    else
+        MiniFrame.Visible = false; MainFrame.Visible = true
+        MainFrame.Position = UDim2.new(0, MiniFrame.AbsolutePosition.X - (MainFrame.AbsoluteSize.X/2 - MiniFrame.AbsoluteSize.X/2), 0, MiniFrame.AbsolutePosition.Y)
+    end
+end
+CloseBtn.MouseButton1Click:Connect(toggleMinimize); MiniOpenBtn.MouseButton1Click:Connect(toggleMinimize)
+
+local function toggleFilters()
+    state.filtersOpen = not state.filtersOpen
+    FiltersFrame.Visible = state.filtersOpen
+    
+    if state.filtersOpen then
+        FiltersFrame.Position = UDim2.new(MainFrame.Position.X.Scale, MainFrame.Position.X.Offset - FiltersFrame.Size.X.Offset - 8, MainFrame.Position.Y.Scale, MainFrame.Position.Y.Offset)
+    end
+end
+FilterBtn.MouseButton1Click:Connect(toggleFilters); FClose.MouseButton1Click:Connect(toggleFilters)
+MiniFilterBtn.MouseButton1Click:Connect(function() 
+    if state.isMinimized then
+        toggleMinimize()
+        task.wait(0.1)
+    end
+    toggleFilters() 
+end)
+
+local function toggleBlacklist()
+    state.blacklistOpen = not state.blacklistOpen
+    BlacklistFrame.Visible = state.blacklistOpen
+    
+    if state.blacklistOpen then
+        BlacklistFrame.Position = UDim2.new(MainFrame.Position.X.Scale, MainFrame.Position.X.Offset + MainFrame.Size.X.Offset + 8, MainFrame.Position.Y.Scale, MainFrame.Position.Y.Offset)
+    end
+end
+BlacklistOpenBtn.MouseButton1Click:Connect(toggleBlacklist); BLClose.MouseButton1Click:Connect(toggleBlacklist)
+
+-- Button click handlers with gradient updates
+AutoJoinBtn.MouseButton1Click:Connect(function() 
+    state.autoJoin = not state.autoJoin; 
+    updateSettingsVisuals() 
+end) 
+
+AutoFinderBtn.MouseButton1Click:Connect(function() 
+    state.autoFinder = not state.autoFinder; 
+    updateSettingsVisuals(); 
+    saveSettings() 
+end)
+
+MInput.FocusLost:Connect(function() 
+    state.minMoney = tonumber(MInput.Text) or 10; 
+    updateSettingsVisuals(); 
+    saveSettings() 
+end)
+
+Tier1.MouseButton1Click:Connect(function() 
+    state.minMoney = 10; 
+    updateSettingsVisuals(); 
+    saveSettings() 
+end)
+
+Tier2.MouseButton1Click:Connect(function() 
+    state.minMoney = 50; 
+    updateSettingsVisuals(); 
+    saveSettings() 
+end)
+
+Tier3.MouseButton1Click:Connect(function() 
+    state.minMoney = 100; 
+    updateSettingsVisuals(); 
+    saveSettings() 
+end)
+
+-- === KEYBINDS ===
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.LeftControl or input.KeyCode == Enum.KeyCode.RightControl then
+        toggleMinimize()
+    elseif input.KeyCode == Enum.KeyCode.R then
+        state.autoJoin = not state.autoJoin
+        updateSettingsVisuals()
+    end
+end)
+
+-- SMALLER LOG CREATION
+local function createLog(data)
+    local moneyVal = tonumber(data.money) or 0
+    local petName = data.name or "Unknown"
+    local jobId = tostring(data.jobid) or ""
+
+    if moneyVal < state.minMoney then return end
+    if state.blacklist[petName] then return end
+    
+    if state.lastJobIds[jobId] then
+        return
+    end
+    
+    state.lastJobIds[jobId] = true
+    
+    local count = 0
+    for k, _ in pairs(state.lastJobIds) do
+        count = count + 1
+        if count > 50 then
+            state.lastJobIds[k] = nil
+        end
+    end
+    
+    if uiElements.LogScroll:FindFirstChild(jobId) then
+        return
+    end
+    
+    local row = Instance.new("Frame")
+    row.Name = jobId
+    row.Size = UDim2.new(1, 0, 0, 32) -- smaller row
+    row.BackgroundColor3 = COLORS.SectionBG
+    row.BorderSizePixel = 0
+    row.Parent = LogScroll
+
+    logSortCounter = logSortCounter - 1
+    row.LayoutOrder = logSortCounter
+    row:SetAttribute("OriginalOrder", logSortCounter)
+
+    -- Pet name with gradient (always active)
+    local rName = Instance.new("TextLabel")
+    rName.Text = petName
+    rName.Size = UDim2.new(0.5, 0, 1, 0)
+    rName.Position = UDim2.new(0.02, 0, 0, 0)
+    rName.BackgroundTransparency = 1
+    rName.TextColor3 = COLORS.TextWhite
+    rName.Font = Enum.Font.GothamBold
+    rName.TextSize = 12 -- smaller
+    rName.TextXAlignment = Enum.TextXAlignment.Left
+    rName.Parent = row
+    applyTextGradient(rName, GRADIENT_AQUA)
+
+    local rMoney = Instance.new("TextLabel")
+    rMoney.Text = formatMoney(moneyVal)
+    rMoney.Size = UDim2.new(0.2, 0, 1, 0)
+    rMoney.Position = UDim2.new(0.52, 0, 0, 0)
+    rMoney.BackgroundTransparency = 1
+    rMoney.TextColor3 = COLORS.MoneyText
+    rMoney.Font = Enum.Font.GothamBold
+    rMoney.TextSize = 12 -- smaller
+    rMoney.TextXAlignment = Enum.TextXAlignment.Left
+    rMoney.Parent = row
+
+    -- Force button - Gradient when active
+    local forceBtn = Instance.new("TextButton")
+    forceBtn.Size = UDim2.new(0, 34, 0, 22) -- smaller
+    forceBtn.Position = UDim2.new(1, -75, 0.5, -11)
+    forceBtn.BackgroundColor3 = COLORS.DarkRed
+    forceBtn.Text = "FORCE"
+    forceBtn.Font = Enum.Font.GothamBold
+    forceBtn.TextSize = 8 -- smaller
+    forceBtn.TextColor3 = COLORS.TextWhite
+    forceBtn.Parent = row
+    
+    forceBtn.MouseButton1Click:Connect(function()
+        if state.forceJobId == jobId then
+            state.forceJobId = nil
+            state.forceJoinActive = false
+            forceBtn.BackgroundColor3 = COLORS.DarkRed
+            forceBtn.Text = "FORCE"
+            forceBtn.TextColor3 = COLORS.TextWhite
+            updateButtonGradient(forceBtn, false) -- Remove gradient
+            state.autoJoin = true 
+            row.LayoutOrder = row:GetAttribute("OriginalOrder")
+            updateSettingsVisuals()
+        else
+            state.forceJobId = jobId
+            state.forceJoinActive = true
+            forceBtn.BackgroundColor3 = COLORS.ForceActive
+            forceBtn.Text = "STOP"
+            forceBtn.TextColor3 = Color3.new(0,0,0)
+            updateButtonGradient(forceBtn, true) -- Add gradient
+            state.autoJoin = false 
+            row.LayoutOrder = -2000000000 
+            updateSettingsVisuals()
+        end
+    end)
+
+    -- Join button - Activated form with bright red and white line
+    local joinBtn = Instance.new("TextButton")
+    joinBtn.Size = UDim2.new(0, 34, 0, 22) -- smaller
+    joinBtn.Position = UDim2.new(1, -38, 0.5, -11)
+    joinBtn.BackgroundColor3 = COLORS.ButtonRed
+    joinBtn.Text = "JOIN"
+    joinBtn.Font = Enum.Font.GothamBlack
+    joinBtn.TextSize = 9 -- smaller
+    joinBtn.TextColor3 = Color3.new(0,0,0) -- Black text for activated form
+    joinBtn.Parent = row
+    updateButtonGradient(joinBtn, true) -- Already activated with white line
+    joinBtn.MouseButton1Click:Connect(function() joinGame(jobId) end)
+
+    if state.autoJoin and not state.forceJobId then joinGame(jobId) end
+end
+
+-- WEBSOCKET
+local function setupWebSocket()
+    if state.socket then
+        pcall(function() state.socket:Close() end)
+        state.socket = nil
+    end
+    
+    if not state.autoFinder then return end
+    
+    local success, socket = pcall(function()
+        if WebSocket and WebSocket.connect then 
+            return WebSocket.connect("ws://localhost:51948")
+        elseif syn and syn.websocket and syn.websocket.connect then 
+            return syn.websocket.connect("ws://localhost:51948") 
+        end
+    end)
+    
+    if success and socket then
+        state.socket = socket
+        
+        socket.OnMessage:Connect(function(msg)
+            if not state.autoFinder then return end
+            
+            local ok, data = pcall(HttpService.JSONDecode, HttpService, msg)
+            if ok and data then 
+                spawn(function()
+                    createLog(data)
+                end)
+            end
+        end)
+        
+        socket.OnClose:Connect(function()
+            state.socket = nil
+            if state.autoFinder then
+                task.wait(2)
+                setupWebSocket()
+            end
+        end)
+    else
+        if state.autoFinder then
+            task.wait(5)
+            setupWebSocket()
+        end
+    end
+end
+
+spawn(function()
+    task.wait(2)
+    setupWebSocket()
+end)
+
+AutoFinderBtn.MouseButton1Click:Connect(function() 
+    state.autoFinder = not state.autoFinder
+    updateSettingsVisuals()
+    saveSettings()
+    
+    if state.autoFinder then
+        task.wait(0.5)
+        setupWebSocket()
+    else
+        if state.socket then
+            pcall(function() state.socket:Close() end)
+            state.socket = nil
+        end
+    end
+end)
+
+updateSettingsVisuals()
+updatePetGrid()
+
+-- Keep the script running
+while true do
+    game:GetService('GuiService'):ClearError()
+    task.wait(0.0000000000000000000000001)
+end
