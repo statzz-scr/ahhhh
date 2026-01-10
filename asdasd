@@ -15,7 +15,7 @@ local LP = Players.LocalPlayer
 
 --================ CONFIG =================
 local WEBHOOK = "https://discord.com/api/webhooks/1457969819570802783/Zad3l1IDeB8r9a7KBdWI9eHNbISdYSZI5O40ZP3q5jX0uPb0Z3DH-yNCRjiYe2lL1T9r"
-local MIN_MONEY = 10_000_000
+local MIN_MONEY = 1_000_000
 local SCAN_DELAY = 4
 local HOP_DELAY =  10 -- đổi 20 nếu muốn hop nhanh hơn
 --========================================
