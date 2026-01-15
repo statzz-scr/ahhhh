@@ -154,7 +154,7 @@ local function scanServer()
 						{ name = "🌐 Join Server", value = "[JOIN](" .. joinLink .. ")", inline = false },
 						{ name = "📜 Join Script", value = "```lua\n" .. joinScript .. "\n```", inline = false }
 					},
-					footer = { text = "RINOLIVE | " .. os.date("%H:%M") }
+					footer = { text = "😡try1 noti😡 | " .. os.date("%H:%M") }
 				}}
 			})
 		})
@@ -197,4 +197,3 @@ if queue_on_teleport then
 		))()
 	]])
 end
-
