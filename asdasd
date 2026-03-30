@@ -14,9 +14,9 @@ local HttpService = game:GetService("HttpService")
 local LP = Players.LocalPlayer
 
 --================ CONFIG =================
-local WEBHOOK = "https://discord.com/api/webhooks/1457969821533868105/hCYKlUpXnhzdvnyTX9go7uovhHUIFgT0-xTVa_o03Bu0Zz900WftU5X0xGngyS_ygECe"
+local WEBHOOK = "https://discord.com/api/webhooks/1488314092924965014/O70REfLDyHGT5nsF7yWOUuHTCU0HIo9cOB5XgErPPxOhMW4OV-sP9cSspeWA1JTCn9IQ"
 local MIN_MONEY = 10_000_000
-local SCAN_DELAY = 4
+local SCAN_DELAY = 5
 local HOP_DELAY =  10 -- đổi 20 nếu muốn hop nhanh hơn
 --========================================
 
